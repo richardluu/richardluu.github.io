@@ -1,5 +1,15 @@
 <html>
-<head>
+
+
+
+<body onload="getLocation()">
+
+<p id="demo">Here's the map.</p>
+<div id="mapholder"></div>
+<!-- 
+<button onclick="getLocation()">Try It</button>
+-->
+
   <script>
 var x = document.getElementById("demo");
 
@@ -37,19 +47,6 @@ function showError(error) {
     }
 }
 </script>
-</head>
-
-
-
-<body onload="getLocation()">
-
-<p id="demo">Here's the map.</p>
-<div id="mapholder"></div>
-<!-- 
-<button onclick="getLocation()">Try It</button>
--->
-
-
 
 
 
