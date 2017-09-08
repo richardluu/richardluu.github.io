@@ -1,0 +1,59 @@
+<html>
+<head>
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  
+  <style>
+    p {
+      text-align: center;
+      font-family: Helvetica;
+      font-size: 17px;
+      font-weight: bold;
+    }
+  </style>
+  <script src="https://richardluu.github.io/js/jquery.min.js"></script>
+  <script type="text/javascript">
+
+
+$.getJSON('https://api.ipify.org?format=json', function(data) {
+  console.log(JSON.stringify(data, null, 2));
+  document.getElementById('myip').innerHTML= JSON.stringify(data, null, 2);
+});
+
+
+
+  var firstsite = 'https://www.whatismyip.com/';
+  var myRequest = new XMLHttpRequest();
+
+
+  myRequest.open("GET", firstsite);
+  //myRequest.setRequestHeader("Cache-Control", "no-cache");
+  myRequest.onreadystatechange = function() {
+    document.getElementById('xhr').innerHTML= this.responseText;
+};
+/*  myRequest.onload = function() {
+    document.getElementById('loaded').innerHTML= this.responseText;
+};
+*/
+  myRequest.send();
+
+
+  </script>
+
+
+</head>
+
+<body>
+  <p>Other Test 1</p>
+  <div id="myip"></div><hr>
+  <h3>SECTION 1</h3>
+  <hr>
+  <div id="xhr"></div><hr>
+  <h3>SECTION 2</h3>
+  <div id="loaded"></div>
+  <hr>
+
+
+</body>
+</html>
+
