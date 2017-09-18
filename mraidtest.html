@@ -1,0 +1,286 @@
+<html>
+<head>
+  <title>MRAID iAd Tests</title>
+  <style>
+  
+  body {
+    margin: 0;
+  }
+  
+  #root {
+    width: 320px;
+    height: 568px;
+    overflow: hidden;
+    background-color: #e3e3e3;
+    font: 12px/15px Helvetica;
+    padding: 8px;
+    -webkit-box-sizing: border-box;
+  }
+  
+  #root iframe {
+    position: absolute;
+    height: 100%;
+    top: 0;
+    border: 0px;
+    box-shadow: 3px 3px 5px rgba(0,0,0,0.2);
+  }
+  
+  table, tr, td {
+    font: 12px/15px Helvetica;
+    margin: 0;
+    padding: 0;
+  }
+  
+  td {
+    padding: 0px 2px;
+  }
+  
+  h1 {
+    text-align: center;
+  }
+  
+  tr span {
+    color: green;
+  }
+
+  </style>
+  <script>
+
+  function MRAIDTests() {
+    if (window.mraid) {
+      var state = window.mraid.getState();
+      if (state !== "loading") {
+        this.mraidReady();
+      }
+      
+      mraid.addEventListener("stateChange", this.mraidStateChangeHandler.bind(this));
+      mraid.addEventListener("viewableChange", this.mraidViewableChangeHandler.bind(this));
+      mraid.addEventListener("error", this.mraidErrorHandler.bind(this));
+      mraid.addEventListener("ready", this.mraidReady.bind(this));
+    } else {      
+      // We're in trouble.
+      document.getElementById("isMRAIDAvailable").innerText = "NO!";
+      document.getElementById("isMRAIDAvailable").style.color = "red";
+      document.getElementById("isMRAIDAvailable").style.fontWeight = "bold";
+    }
+  };
+  
+  MRAIDTests.prototype.mraidReady = function (event) {
+    if (this._mraidReadyHasBeenCalled) {
+      return;
+    }
+    this._mraidReadyHasBeenCalled = true;
+    
+    document.getElementById("isMRAIDAvailable").innerText = "Yes";
+    this.handleGetVersion();
+    this.handleGetPlacement();
+    
+    document.getElementById("stateButton").addEventListener("click", this.handleGetState.bind(this), false);
+    document.getElementById("viewableButton").addEventListener("click", this.handleViewable.bind(this), false);
+    document.getElementById("openAppleWebButton").addEventListener("click", this.handleOpenAppleWeb.bind(this), false);
+    document.getElementById("openBBCWebButton").addEventListener("click", this.handleOpenBBCWeb.bind(this), false);
+    document.getElementById("openNewsButton").addEventListener("click", this.handleOpenNews.bind(this), false);
+    document.getElementById("getExpandPropertiesButton").addEventListener("click", this.handleGetExpandProperties.bind(this), false);
+    document.getElementById("setExpandPropertiesButton").addEventListener("click", this.handleSetExpandProperties.bind(this), false);
+    document.getElementById("expandButton").addEventListener("click", this.handleExpand.bind(this), false);
+    document.getElementById("closeButton").addEventListener("click", this.handleClose.bind(this), false);
+    document.getElementById("useCustomCloseButton").addEventListener("click", this.handleUseCustomClose.bind(this), false);
+    document.getElementById("calendarEventButton").addEventListener("click", this.handleCalendarEvent.bind(this), false);
+  };
+  
+  MRAIDTests.prototype.mraidStateChangeHandler = function (state) {
+    document.getElementById("state").innerText = state;
+    document.getElementById("events").innerText = "state";
+  };
+  
+  MRAIDTests.prototype.mraidViewableChangeHandler = function (viewable) {
+    this.handleViewable();
+    document.getElementById("events").innerText = "viewable";
+  };
+  
+  MRAIDTests.prototype.mraidErrorHandler = function (errorMessage, action) {
+    document.getElementById("errors").innerHTML = "# " + action + " " + errorMessage;
+  };
+  
+  MRAIDTests.prototype.handleGetState = function (event) {
+    document.getElementById("state").innerText = mraid.getState();
+  };
+  
+  MRAIDTests.prototype.handleGetVersion = function (event) {
+    document.getElementById("version").innerText = mraid.getVersion();
+  };
+  
+  MRAIDTests.prototype.handleGetPlacement = function (event) {
+    document.getElementById("placement").innerText = mraid.getPlacementType();
+  };
+  
+  MRAIDTests.prototype.handleViewable = function (event) {
+    var isViewable = mraid.isViewable();
+    document.getElementById("viewable").innerText = (viewable ? "Yes" : "No");
+    document.getElementById("viewable").style.color = (viewable ? "green" : "red");
+  };
+  
+  MRAIDTests.prototype.handleOpenAppleWeb = function (event) {
+    mraid.open("http://www.apple.com");
+  };
+  
+  MRAIDTests.prototype.handleOpenBBCWeb = function (event) {
+    mraid.open("http://www.bbc.com");
+  };
+  
+  MRAIDTests.prototype.handleOpenNews = function (event) {
+    mraid.open("https://apple.news/A1frPvqPbThaTq_Cb2Trpiw");
+  };
+  
+  MRAIDTests.prototype.handleGetExpandProperties = function (event) {
+    var properties = mraid.getExpandProperties();
+    document.getElementById("expandProperties").innerText = properties.width + " x " + properties.height + ", useCustomClose: " + properties.useCustomClose + ", isModal: " + properties.isModal;
+  };
+  
+  MRAIDTests.prototype.handleSetExpandProperties = function (event) {
+    mraid.setExpandProperties({
+      width : 320,
+      height : 568
+    });
+  };
+  
+  MRAIDTests.prototype.handleExpand = function (event) {
+    mraid.expand("https://iad2v2-iadctest.iad.apple.com/adunits/ERIE/mraid-expanded.html");
+  };
+  
+  MRAIDTests.prototype.handleClose = function (event) {
+    mraid.close();
+  };
+  
+  MRAIDTests.prototype.handleUseCustomClose = function (event) {
+    mraid.useCustomClose();
+  };
+  
+  MRAIDTests.prototype.handleCalendarEvent = function (event) {
+      var start = new Date();
+      start.setHours(15);
+      start.setMinutes(3);
+      start.setSeconds(7);
+      var end = new Date(+start + 15 * 60 * 1000);
+      var startDate = start.toISOString();
+      var endDate = end.toISOString();
+      var expires = +(new Date()) + (1000 * 24 * 3600 * 20);
+      var calendarEvent = {
+          "description": "My special event",
+          "location": "Cupertino, CA",
+          "summary": "Discuss the future.",
+          "url": "http://www.apple.com/",
+          "start": startDate,
+          "end": endDate,
+          "recurrence": {
+              "frequency": "daily",
+              "interval": 1,
+              "expires": expires
+          }
+      }
+      mraid._createCalendarEvent(calendarEvent);
+  }
+  
+  window.addEventListener("DOMContentLoaded", function () {
+    var mraidTests = new MRAIDTests();
+    
+    document.getElementById("setCookie").addEventListener("click", function (event) {
+      document.cookie = "username=Shams; expires=Thu, 18 Dec 2017 12:00:00 UTC; path=/";
+      document.getElementById("cookie").innerText = "cookie set";
+    });
+    
+    document.getElementById("getCookie").addEventListener("click", function (event) {
+      if (!document.cookie.length) {
+        document.getElementById("cookie").innerText = "no cookies";
+      } else {
+        document.getElementById("cookie").innerText = document.cookie;
+      }
+    });
+    
+    document.getElementById("iframeButton").addEventListener("click", function (event) {
+      var iframe = document.createElement("iframe");
+      iframe.src = "https://iad2v2-iadctest.iad.apple.com/adunits/ERIE/mraid-expanded.html"
+      document.getElementById("root").appendChild(iframe);
+      
+    });
+    
+    document.getElementById("xhrButton").addEventListener("click", function (event) {
+      var xhr = new XMLHttpRequest();
+      xhr.addEventListener("load", function (event) {
+        document.getElementById("xhrResult").innerText = "Success! HTTP Status Code: " + xhr.status;
+      });
+      
+      xhr.addEventListener("error", function (event) {
+        document.getElementById("xhrResult").innerText = "Error! HTTP Status Code: " + xhr.status;
+      });
+      xhr.open("GET", "https://httpbin.org/get");
+      xhr.send();
+    });
+    
+  });
+  
+  </script>
+  
+</head>
+<body>
+  <div id="root">
+    <table>
+      <tr>
+        <td><input type="text" name="user"></td>
+      </tr>
+      <tr>
+        <td>MRAID available?</td>
+        <td><span id="isMRAIDAvailable"></span></td>
+        <td>Version:</td>
+        <td><span id="version"></span></td>
+      </tr>
+      <tr>
+        <td>Placement Type:</td>
+        <td><span id="placement"></span></td>
+        <td>State:</td>
+        <td><span id="state"></span></td>
+      </tr>
+      <tr>
+        <td>Events:</td>
+        <td><span id="events"></span></td>
+        <td>Viewable:</td>
+        <td><span id="viewable"></span></td>
+      </tr>
+      <tr>
+        <td>ExpandProperties:</td>
+        <td><span id="expandProperties"></span></td>
+        <td>Error(s):</td>
+        <td><span id="errors"></span></td>
+      </tr>
+      <tr>
+        <td>Cookies:</td>
+        <td colspan="3"><span id="cookie"></span></td>
+      </tr>
+    </table>
+    <div>
+      <button id="stateButton" type="button">Get State</button> 
+      <button id="viewableButton" type="button">isViewable</button>
+      <br><br>
+      <button id="openAppleWebButton" type="button">Open apple.com</button>
+      <button id="openBBCWebButton" type="button">Open bbc.com</button>
+      <button id="openNewsButton" type="button">Open News Article</button> 
+      <br><br>
+      <button id="setExpandPropertiesButton" type="button">Set ExpandProperties (320 x 568)</button>
+      <button id="getExpandPropertiesButton" type="button">Get ExpandProperties</button>
+      <button id="expandButton" type="button">Expand</button>
+      <button id="closeButton" type="button">Close</button>
+      <br><br>
+      <button id="calendarEventButton" type="button">Add Calendar Event</button>
+      <br><br>
+      <button id="useCustomCloseButton" type="button">UseCustomClose</button>
+      <button id="setCookie">setCookie</button>
+      <button id="getCookie">getCookie</button>
+      <a href="http://www.apple.com">Link</a>
+      <br><br>
+      <button id="iframeButton" type="button">Embed i-frame</button>
+      <button id="xhrButton" type="button">Make XHR request</button>
+      <div id="xhrResult"></div>
+    </div>
+  </div>
+</body>
+</html>
